@@ -1,0 +1,576 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Интерактивная презентация о муниципальном управлении, выборах и бюджете Казани.">
+  <title>Муниципальное управление Казани</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --ink: #f5f2ea;
+      --muted: #b7c1c2;
+      --paper: #102a2c;
+      --panel: #183638;
+      --line: rgba(245, 242, 234, .16);
+      --accent: #c4ed73;
+      --accent-2: #78d5c1;
+      --warm: #ffbd82;
+      --shadow: 0 24px 80px rgba(0, 0, 0, .35);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body { height: 100%; }
+
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: #071b1c;
+      color: var(--ink);
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+    }
+
+    button, a { font: inherit; }
+    a { color: var(--accent); text-underline-offset: .2em; }
+
+    .deck {
+      position: relative;
+      display: grid;
+      place-items: center;
+      height: 100%;
+      padding: 28px 30px 70px;
+      background:
+        radial-gradient(ellipse at 86% 12%, rgba(120, 213, 193, .12), transparent 34%),
+        radial-gradient(ellipse at 10% 85%, rgba(196, 237, 115, .08), transparent 32%),
+        #071b1c;
+    }
+
+    .slide {
+      display: none;
+      position: relative;
+      width: min(1200px, 100%);
+      height: min(675px, calc(100vh - 112px));
+      min-height: 480px;
+      padding: clamp(30px, 5vw, 72px);
+      overflow: auto;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.025), transparent 52%),
+        var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .slide.active { display: block; animation: appear .35s ease-out; }
+    @keyframes appear { from { opacity: .3; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+    .slide::after {
+      content: "";
+      position: absolute;
+      right: -85px;
+      bottom: -180px;
+      width: 360px;
+      height: 360px;
+      border: 1px solid rgba(196, 237, 115, .14);
+      border-radius: 50%;
+      box-shadow: 0 0 0 35px rgba(196,237,115,.025), 0 0 0 70px rgba(196,237,115,.02);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0 20px;
+      color: var(--accent);
+      font-size: .78rem;
+      font-weight: 750;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+    .eyebrow::before { content: ""; width: 24px; height: 2px; background: var(--accent); }
+
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { max-width: 760px; margin-bottom: 22px; font-size: clamp(2.6rem, 6vw, 5.2rem); line-height: .98; letter-spacing: -.055em; }
+    h2 { max-width: 900px; margin-bottom: 26px; font-size: clamp(2rem, 4vw, 3.25rem); line-height: 1.04; letter-spacing: -.04em; }
+    h3 { margin-bottom: 10px; font-size: 1.12rem; }
+    p { color: var(--muted); line-height: 1.55; }
+    strong { color: var(--ink); }
+    .lead { max-width: 700px; font-size: clamp(1.05rem, 2vw, 1.38rem); line-height: 1.55; }
+    .accent { color: var(--accent); }
+    .warm { color: var(--warm); }
+
+    .cover { display: flex; flex-direction: column; justify-content: center; }
+    .cover .lead { max-width: 610px; margin-bottom: 34px; }
+    .cover-meta { display: flex; flex-wrap: wrap; gap: 10px; }
+    .pill {
+      padding: 9px 13px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: .86rem;
+    }
+    .cover-mark {
+      position: absolute;
+      right: 7%;
+      top: 50%;
+      width: clamp(160px, 25vw, 300px);
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+      transform: translateY(-50%);
+      border: 1px solid rgba(196, 237, 115, .4);
+      border-radius: 50%;
+      color: var(--accent);
+      font-family: Georgia, serif;
+      font-size: clamp(5rem, 12vw, 9rem);
+      line-height: 1;
+      box-shadow: inset 0 0 60px rgba(196, 237, 115, .06), 0 0 0 20px rgba(196,237,115,.025);
+    }
+    .cover-mark::before, .cover-mark::after {
+      content: "";
+      position: absolute;
+      inset: 17px;
+      border: 1px solid rgba(196, 237, 115, .18);
+      border-radius: 50%;
+    }
+    .cover-mark::after { inset: -20px; border-color: rgba(196, 237, 115, .1); }
+
+    .grid-2, .grid-3, .grid-4 { display: grid; gap: 14px; }
+    .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .card {
+      padding: 20px 21px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255,255,255,.035);
+    }
+    .card p:last-child { margin-bottom: 0; }
+    .card .number { display: block; margin-bottom: 8px; color: var(--accent); font-size: 2.45rem; font-weight: 760; letter-spacing: -.06em; }
+    .card .number.small { font-size: 1.65rem; }
+    .small { font-size: .9rem; }
+    .tight { margin-bottom: 8px; }
+
+    .flow {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr auto 1fr;
+      align-items: stretch;
+      gap: 12px;
+      margin: 18px 0 20px;
+    }
+    .flow-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 150px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--panel);
+    }
+    .flow-card .tag { margin-bottom: 12px; color: var(--accent-2); font-size: .72rem; font-weight: 750; letter-spacing: .12em; text-transform: uppercase; }
+    .arrow { align-self: center; color: var(--accent); font-size: 1.7rem; }
+    .note {
+      padding: 15px 18px;
+      border-left: 3px solid var(--accent);
+      border-radius: 0 10px 10px 0;
+      background: rgba(196, 237, 115, .08);
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .note strong { color: var(--accent); }
+
+    .checklist { display: grid; gap: 12px; padding: 0; list-style: none; }
+    .checklist li { position: relative; padding-left: 27px; color: var(--muted); line-height: 1.48; }
+    .checklist li::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      top: 0;
+      color: var(--accent);
+      font-weight: 800;
+    }
+    .source-line { position: relative; z-index: 1; margin-top: 23px; color: #95a8a8; font-size: .77rem; line-height: 1.45; }
+    .source-line a { color: #b7d99b; }
+    .cite { white-space: nowrap; }
+
+    .budget-number { display: flex; align-items: baseline; gap: 10px; margin: 0 0 6px; }
+    .budget-number strong { color: var(--accent); font-size: clamp(2.7rem, 6vw, 5rem); letter-spacing: -.06em; line-height: 1; }
+    .budget-number span { color: var(--muted); font-size: 1.1rem; }
+    .bar-wrap { margin: 25px 0 10px; }
+    .bar {
+      height: 22px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(255,255,255,.1);
+    }
+    .bar > span { display: block; width: 51.5%; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); }
+    .bar-labels { display: flex; justify-content: space-between; gap: 10px; margin-top: 8px; color: var(--muted); font-size: .83rem; }
+
+    .verdict {
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      align-items: center;
+      gap: 24px;
+    }
+    .verdict-box {
+      padding: 24px;
+      border: 1px solid rgba(196,237,115,.35);
+      border-radius: 16px;
+      background: rgba(196,237,115,.07);
+    }
+    .verdict-box h3 { color: var(--accent); }
+    .sources-list { display: grid; gap: 12px; padding: 0; list-style: none; }
+    .sources-list li { padding: 14px 16px; border: 1px solid var(--line); border-radius: 11px; background: rgba(255,255,255,.025); }
+    .sources-list a { font-weight: 650; }
+    .sources-list span { display: block; margin-top: 5px; color: var(--muted); font-size: .83rem; line-height: 1.4; }
+
+    .controls {
+      position: absolute;
+      right: 32px;
+      bottom: 20px;
+      left: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: min(1200px, calc(100% - 64px));
+      margin: auto;
+      color: var(--muted);
+      font-size: .85rem;
+    }
+    .control-group { display: flex; align-items: center; gap: 8px; }
+    .controls button {
+      min-width: 42px;
+      min-height: 36px;
+      padding: 6px 12px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel);
+      color: var(--ink);
+      cursor: pointer;
+    }
+    .controls button:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+    .controls button:disabled { opacity: .38; cursor: default; }
+    .progress { flex: 1; height: 3px; margin: 0 18px; overflow: hidden; background: rgba(255,255,255,.12); }
+    .progress span { display: block; height: 100%; width: 0; background: var(--accent); transition: width .25s ease; }
+
+    @media (max-width: 800px) {
+      .deck { padding: 12px 12px 62px; }
+      .slide { height: calc(100vh - 88px); min-height: 0; padding: 28px 24px; border-radius: 14px; }
+      .cover-mark { right: 8%; top: auto; bottom: 7%; width: 120px; transform: none; font-size: 4.5rem; opacity: .45; }
+      .grid-3, .grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .flow { grid-template-columns: 1fr; }
+      .flow-card { min-height: auto; }
+      .arrow { transform: rotate(90deg); }
+      .controls { right: 12px; bottom: 12px; left: 12px; width: calc(100% - 24px); }
+      .progress { margin: 0 8px; }
+    }
+    @media (max-width: 560px) {
+      .grid-2, .grid-3, .grid-4, .verdict { grid-template-columns: 1fr; }
+      .cover-mark { display: none; }
+      .slide { padding: 24px 19px; }
+      .card { padding: 16px; }
+      .progress { display: none; }
+      .controls { font-size: .75rem; }
+    }
+    @media print {
+      @page { size: 13.333in 7.5in; margin: 0; }
+      html, body { height: auto; overflow: visible; background: #fff; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+      .deck { display: block; height: auto; padding: 0; background: #fff; }
+      .slide, .slide.active {
+        display: block !important;
+        width: 13.333in;
+        height: 7.5in;
+        min-height: 0;
+        margin: 0;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+        overflow: hidden;
+        break-after: page;
+        page-break-after: always;
+      }
+      .controls { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="deck" aria-label="Презентация: муниципальное управление Казани">
+    <section class="slide active cover" aria-label="Слайд 1">
+      <p class="eyebrow">Муниципальное управление · разбор города</p>
+      <h1>Казань:<br><span class="accent">кто решает</span><br>и за чей счёт?</h1>
+      <p class="lead">Как устроены городская Дума и мэрия, как формируется руководство и хватает ли налоговой базы на городские задачи.</p>
+      <div class="cover-meta">
+        <span class="pill">Основа: Устав Казани</span>
+        <span class="pill">Официальные муниципальные источники</span>
+        <span class="pill">Бюджет: план 2025 + данные документа 2026</span>
+      </div>
+      <div class="cover-mark" aria-hidden="true">К</div>
+    </section>
+
+    <section class="slide" aria-label="Слайд 2">
+      <p class="eyebrow">01 · Правовая рамка</p>
+      <h2>Устав — «правила игры» для города</h2>
+      <div class="grid-2">
+        <article class="card">
+          <span class="number small">Что устанавливает</span>
+          <ul class="checklist">
+            <li>территориальную организацию и вопросы местного значения;</li>
+            <li>структуру органов местного самоуправления;</li>
+            <li>порядок формирования Думы и должности главы города;</li>
+            <li>полномочия, бюджетный процесс и формы участия жителей.</li>
+          </ul>
+        </article>
+        <article class="card">
+          <span class="number small">Как читать анализ</span>
+          <p>Устав отвечает на вопрос <strong>«кто и как управляет»</strong>. Числа по деньгам берутся из утверждённого бюджета и официальных бюджетных материалов — это отдельные документы, а не статьи Устава.</p>
+          <p class="small">Термины: «городская Дума» — представительный орган; «Мэр» — глава муниципального образования; «Исполнительный комитет» — исполнительный орган.</p>
+        </article>
+      </div>
+      <p class="source-line">Источник: <a href="https://culture.kzn.ru/o-kazani/ustav-kazani/" target="_blank" rel="noopener">Устав Казани — официальный портал</a>; <a href="https://kzn.ru/meriya/munitsipalnye-pravovye-akty/" target="_blank" rel="noopener">муниципальные правовые акты</a>.</p>
+    </section>
+
+    <section class="slide" aria-label="Слайд 3">
+      <p class="eyebrow">02 · Устройство власти</p>
+      <h2>Два контура: представлять жителей и управлять службами</h2>
+      <div class="flow">
+        <article class="flow-card">
+          <span class="tag">Жители</span>
+          <h3>Голосуют</h3>
+          <p class="small">Выбирают депутатов городской Думы на муниципальных выборах.</p>
+        </article>
+        <span class="arrow" aria-hidden="true">→</span>
+        <article class="flow-card">
+          <span class="tag">Представительство</span>
+          <h3>Казанская городская Дума</h3>
+          <p class="small">Принимает решения и утверждает бюджет; избирает главу города в порядке, установленном Уставом.</p>
+        </article>
+        <span class="arrow" aria-hidden="true">→</span>
+        <article class="flow-card">
+          <span class="tag">Исполнение</span>
+          <h3>Мэрия / Исполком</h3>
+          <p class="small">Организует выполнение решений, муниципальных программ и повседневных городских функций.</p>
+        </article>
+      </div>
+      <div class="grid-2">
+        <div class="note"><strong>Контроль:</strong> Контрольно-счётная палата проверяет использование муниципальных средств и исполнение бюджета.</div>
+        <div class="note"><strong>Важно:</strong> районные администрации работают внутри единой системы города; это не отдельные городские думы.</div>
+      </div>
+      <p class="source-line">Источник: <a href="https://culture.kzn.ru/o-kazani/ustav-kazani/" target="_blank" rel="noopener">Устав Казани</a>; <a href="https://kzn.ru/meriya/kazanskaya-gorodskaya-duma/" target="_blank" rel="noopener">Казанская городская Дума</a>.</p>
+    </section>
+
+    <section class="slide" aria-label="Слайд 4">
+      <p class="eyebrow">03 · Представительный орган</p>
+      <h2>Казанская городская Дума — <span class="accent">50 депутатов</span></h2>
+      <div class="grid-3">
+        <article class="card">
+          <span class="number">50</span>
+          <h3>Депутатов</h3>
+          <p>Официальная страница города указывает состав Думы в 50 депутатов.</p>
+        </article>
+        <article class="card">
+          <span class="number">5 лет</span>
+          <h3>Срок полномочий</h3>
+          <p>Депутаты избираются жителями на установленный срок.</p>
+        </article>
+        <article class="card">
+          <span class="number small">Публичная власть</span>
+          <h3>Решения и контроль</h3>
+          <p>Дума принимает муниципальные правовые акты, утверждает бюджет и контролирует его исполнение.</p>
+        </article>
+      </div>
+      <div class="note" style="margin-top:16px"><strong>Как избираются депутаты?</strong> Жителями на муниципальных выборах. Конкретную схему округов и распределение мандатов определяют избирательное законодательство и решения о выборах; проверяйте схему именно для соответствующего созыва.</div>
+      <p class="source-line">Источник: <a href="https://kzn.ru/meriya/kazanskaya-gorodskaya-duma/" target="_blank" rel="noopener">официальная страница Казанской городской Думы</a>; <a href="https://culture.kzn.ru/o-kazani/ustav-kazani/" target="_blank" rel="noopener">Устав Казани</a>.</p>
+    </section>
+
+    <section class="slide" aria-label="Слайд 5">
+      <p class="eyebrow">04 · Руководство и выборы</p>
+      <h2>Мэр и глава Исполкома — <span class="warm">не одна должность</span></h2>
+      <div class="grid-2">
+        <article class="card">
+          <span class="number small">Мэр Казани</span>
+          <h3>Глава муниципального образования</h3>
+          <ul class="checklist">
+            <li>представляет город и действует от его имени;</li>
+            <li>связан с работой городской Думы и её заседаний;</li>
+            <li>избирается Думой в порядке, установленном действующей редакцией Устава.</li>
+          </ul>
+          <p class="small">Это не прямые выборы мэра всеми жителями.</p>
+        </article>
+        <article class="card">
+          <span class="number small">Глава Исполкома</span>
+          <h3>Руководитель исполнительной администрации</h3>
+          <ul class="checklist">
+            <li>организует практическую работу исполнительных подразделений;</li>
+            <li>отвечает за выполнение муниципальных задач и программ;</li>
+            <li>замещает должность по процедуре, предусмотренной Уставом и муниципальными актами.</li>
+          </ul>
+          <p class="small">Это административный контур, а не представительный мандат.</p>
+        </article>
+      </div>
+      <div class="note" style="margin-top:16px"><strong>Схема подотчётности:</strong> жители → депутаты; Дума формирует предусмотренное Уставом руководство; Исполком обеспечивает исполнение решений и бюджета.</div>
+      <p class="source-line">Источник: <a href="https://culture.kzn.ru/o-kazani/ustav-kazani/" target="_blank" rel="noopener">Устав Казани — порядок избрания главы и структура органов</a>; <a href="https://kzn.ru/meriya/press-tsentr/novosti/" target="_blank" rel="noopener">официальные сообщения мэрии</a>.</p>
+    </section>
+
+    <section class="slide" aria-label="Слайд 6">
+      <p class="eyebrow">05 · Тип муниципального управления</p>
+      <h2>Модель Казани: <span class="accent">Дума + глава города + Исполком</span></h2>
+      <div class="grid-3">
+        <article class="card">
+          <h3>1. Представительный уровень</h3>
+          <p>Депутаты получают мандат на муниципальных выборах, принимают обязательные решения и утверждают бюджет.</p>
+        </article>
+        <article class="card">
+          <h3>2. Глава города</h3>
+          <p>Мэр — глава муниципального образования; способ избрания закреплён Уставом и не совпадает с прямыми выборами депутатов.</p>
+        </article>
+        <article class="card">
+          <h3>3. Исполнительный уровень</h3>
+          <p>Исполком ведёт ежедневное управление: муниципальные услуги, хозяйственные задачи и реализацию программ.</p>
+        </article>
+      </div>
+      <div class="note" style="margin-top:18px"><strong>Итоговая классификация:</strong> система с отдельными представительским и исполнительным контурами; политическое представительство организовано через Думу, а текущее управление — через Исполком. В бытовом смысле её можно назвать «думско-мэрской», но юридически ориентироваться нужно на формулировки Устава.</div>
+      <p class="source-line">Источник: <a href="https://culture.kzn.ru/o-kazani/ustav-kazani/" target="_blank" rel="noopener">Устав Казани</a>; <a href="https://kzn.ru/meriya/kazanskaya-gorodskaya-duma/" target="_blank" rel="noopener">страница Думы</a>.</p>
+    </section>
+
+    <section class="slide" aria-label="Слайд 7">
+      <p class="eyebrow">06 · Налоги и бюджетная база</p>
+      <h2>Налоговая база значительная, но <span class="warm">не единственная</span></h2>
+      <div class="grid-2">
+        <div>
+          <p class="budget-number"><strong>32,1</strong><span>млрд ₽</span></p>
+          <p class="tight">Налоговые доходы в одном из опубликованных бюджетных документов</p>
+          <div class="bar-wrap">
+            <div class="bar" role="img" aria-label="Налоговые доходы составляют 51,5 процента общего объема доходов"><span></span></div>
+            <div class="bar-labels"><span>Налоговые доходы · 51,5%</span><span>Остальные источники · 48,5%</span></div>
+          </div>
+          <p class="small">В документе среди заметных источников названы НДФЛ и упрощённая система налогообложения.</p>
+        </div>
+        <article class="card">
+          <h3>Что это говорит о достаточности?</h3>
+          <ul class="checklist">
+            <li>налоги формируют крупнейшую отдельную часть доходов;</li>
+            <li>одних налогов недостаточно, чтобы покрыть весь общий объём доходов бюджета;</li>
+            <li>остальная часть складывается из неналоговых доходов и безвозмездных поступлений, включая трансферты.</li>
+          </ul>
+          <p class="small">Нельзя по одной доле налогов заключить, что «денег городу хватает»: для этого сравнивают фактическое исполнение, обязательства, дефицит и трансферты.</p>
+        </article>
+      </div>
+      <p class="source-line">Источник: <a href="https://pravo.tatarstan.ru/file/npa/2026-02/1794845/npa_1794846.pdf" target="_blank" rel="noopener">официально опубликованное приложение к муниципальному акту (февраль 2026)</a>. Это показатель из указанного документа; не смешивать его с планом расходов 2025 года на следующем слайде.</p>
+    </section>
+
+    <section class="slide" aria-label="Слайд 8">
+      <p class="eyebrow">07 · Бюджет города</p>
+      <h2>Бюджет — это не только налоги</h2>
+      <div class="grid-2">
+        <article class="card">
+          <span class="number small">Утверждённый бюджет · 2025</span>
+          <p class="budget-number"><strong>50,177</strong><span>млрд ₽</span></p>
+          <p>Официальный портал Казани сообщил об утверждении бюджета на 2025 год в таком общем объёме.</p>
+          <p class="small">Это плановый показатель, а не окончательный отчёт об исполнении.</p>
+        </article>
+        <article class="card">
+          <h3>Откуда берутся средства</h3>
+          <ul class="checklist">
+            <li><strong>Налоговые доходы:</strong> НДФЛ, налоги на имущество и другие закреплённые поступления;</li>
+            <li><strong>Неналоговые доходы:</strong> аренда муниципального имущества, платные услуги и прочие поступления;</li>
+            <li><strong>Безвозмездные поступления:</strong> трансферты из бюджетов других уровней.</li>
+          </ul>
+        </article>
+      </div>
+      <div class="note" style="margin-top:16px"><strong>Как понимать «хватает»:</strong> бюджет обеспечивает утверждённые расходы за счёт всех источников вместе. Налоговая база Казани крупная, однако собственных налоговых поступлений недостаточно для покрытия всей бюджетной потребности без других доходов и межбюджетной поддержки.</div>
+      <p class="source-line">Источник: <a href="https://kzn.ru/meriya/ispolnitelnyy-komitet/finansovoe-upravlenie/byudzhet-dlya-grazhdan/" target="_blank" rel="noopener">«Бюджет для граждан» — финансовое управление Казани</a>; <a href="https://kzn.ru/meriya/ispolnitelnyy-komitet/finansovoe-upravlenie/novosti/?tag=%D0%B1%D1%8E%D0%B4%D0%B6%D0%B5%D1%82" target="_blank" rel="noopener">бюджетные публикации официального портала</a>.</p>
+    </section>
+
+    <section class="slide" aria-label="Слайд 9">
+      <p class="eyebrow">08 · Выводы</p>
+      <h2>Короткий ответ на главные вопросы</h2>
+      <div class="verdict">
+        <div>
+          <ul class="checklist">
+            <li><strong>Сколько депутатов?</strong> 50; срок полномочий — 5 лет.</li>
+            <li><strong>Кто управляет?</strong> Дума принимает решения; Мэр — глава города; Исполком организует исполнение.</li>
+            <li><strong>Как выбирают?</strong> Депутаты избираются жителями; Мэр — Думой по модели, закреплённой Уставом.</li>
+            <li><strong>Какой тип управления?</strong> Разделены представительный и исполнительный контуры.</li>
+          </ul>
+        </div>
+        <aside class="verdict-box">
+          <h3>Налогов хватает?</h3>
+          <p><strong>Одних налогов — нет.</strong> Они дают около половины доходов в приведённом бюджетном документе. Бюджет складывается также из неналоговых источников и межбюджетных поступлений.</p>
+          <p class="small">Это вывод о структуре финансирования, а не оценка качества услуг или точный расчёт дефицита.</p>
+        </aside>
+      </div>
+      <p class="source-line">Сведения о Думе и управлении: <a href="https://kzn.ru/meriya/kazanskaya-gorodskaya-duma/" target="_blank" rel="noopener">официальная страница Думы</a>, <a href="https://culture.kzn.ru/o-kazani/ustav-kazani/" target="_blank" rel="noopener">Устав</a>. Финансы: официальные бюджетные источники, указанные на слайдах 7–8.</p>
+    </section>
+
+    <section class="slide" aria-label="Слайд 10">
+      <p class="eyebrow">Источники</p>
+      <h2>Официальные документы и страницы</h2>
+      <ul class="sources-list">
+        <li><a href="https://culture.kzn.ru/o-kazani/ustav-kazani/" target="_blank" rel="noopener">Устав муниципального образования города Казани</a><span>Официальный портал Казани: органы, полномочия, порядок формирования и структура.</span></li>
+        <li><a href="https://kzn.ru/meriya/kazanskaya-gorodskaya-duma/" target="_blank" rel="noopener">Казанская городская Дума</a><span>Официальная страница представительного органа: состав — 50 депутатов, срок — 5 лет.</span></li>
+        <li><a href="https://kzn.ru/meriya/ispolnitelnyy-komitet/finansovoe-upravlenie/byudzhet-dlya-grazhdan/" target="_blank" rel="noopener">«Бюджет для граждан»</a><span>Финансовое управление Исполнительного комитета Казани.</span></li>
+        <li><a href="https://kzn.ru/meriya/ispolnitelnyy-komitet/finansovoe-upravlenie/novosti/?tag=%D0%B1%D1%8E%D0%B4%D0%B6%D0%B5%D1%82" target="_blank" rel="noopener">Бюджетные публикации Казани</a><span>Новости и сообщения об утверждении городского бюджета.</span></li>
+        <li><a href="https://pravo.tatarstan.ru/file/npa/2026-02/1794845/npa_1794846.pdf" target="_blank" rel="noopener">Официальная публикация приложения к муниципальному акту (02.2026)</a><span>Источник показателя: 32,1 млрд ₽ налоговых доходов, или 51,5% объёма доходов в документе.</span></li>
+      </ul>
+      <p class="source-line">Дата подготовки презентации: 25 ноября 2026 г. Для юридически значимых решений сверяйте действующую редакцию Устава и конкретный акт о бюджете.</p>
+    </section>
+  </main>
+
+  <nav class="controls" aria-label="Управление презентацией">
+    <div class="control-group">
+      <button type="button" id="prev" aria-label="Предыдущий слайд">←</button>
+      <button type="button" id="next" aria-label="Следующий слайд">→</button>
+    </div>
+    <div class="progress" aria-hidden="true"><span id="progress"></span></div>
+    <span id="counter" aria-live="polite">1 / 10</span>
+    <span style="margin-left:14px">← → · пробел · печать / PDF</span>
+  </nav>
+
+  <script>
+    (() => {
+      const slides = [...document.querySelectorAll(".slide")];
+      const prev = document.getElementById("prev");
+      const next = document.getElementById("next");
+      const counter = document.getElementById("counter");
+      const progress = document.getElementById("progress");
+      let current = 0;
+
+      function show(index) {
+        current = Math.max(0, Math.min(slides.length - 1, index));
+        slides.forEach((slide, i) => {
+          slide.classList.toggle("active", i === current);
+          slide.setAttribute("aria-hidden", String(i !== current));
+        });
+        prev.disabled = current === 0;
+        next.disabled = current === slides.length - 1;
+        counter.textContent = `${current + 1} / ${slides.length}`;
+        progress.style.width = `${((current + 1) / slides.length) * 100}%`;
+        history.replaceState(null, "", `#slide-${current + 1}`);
+      }
+
+      prev.addEventListener("click", () => show(current - 1));
+      next.addEventListener("click", () => show(current + 1));
+      document.addEventListener("keydown", (event) => {
+        if (event.altKey || event.ctrlKey || event.metaKey) return;
+        if (["ArrowRight", " ", "PageDown"].includes(event.key)) {
+          event.preventDefault();
+          show(current + 1);
+        } else if (["ArrowLeft", "PageUp"].includes(event.key)) {
+          event.preventDefault();
+          show(current - 1);
+        } else if (event.key === "Home") {
+          show(0);
+        } else if (event.key === "End") {
+          show(slides.length - 1);
+        }
+      });
+
+      const initial = Number(location.hash.replace("#slide-", ""));
+      show(Number.isInteger(initial) && initial > 0 ? initial - 1 : 0);
+    })();
+  </script>
+</body>
+</html>
